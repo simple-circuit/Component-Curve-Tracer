@@ -1,0 +1,9 @@
+0.0233 0.00976 512.0 509.5 0.00518 
+vgain igain voff ioff icomp
+
+vgain: volts per analog to digital unit
+igain: mA per analog to digital unit
+voff: mid point for Voltage analog to digital unit
+ioff: mid point for Current analong to digital unit
+icomp: constant to correct for voltage sense circuit
+
