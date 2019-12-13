@@ -66,14 +66,14 @@ object Form1: TForm1
   end
   object Shape4: TShape
     Left = 524
-    Height = 86
-    Top = 376
+    Height = 64
+    Top = 392
     Width = 274
     Brush.Style = bsClear
   end
   object Shape3: TShape
     Left = 524
-    Height = 53
+    Height = 64
     Top = 320
     Width = 274
     Brush.Style = bsClear
@@ -197,7 +197,7 @@ object Form1: TForm1
   object dacspin: TFloatSpinEdit
     Left = 624
     Height = 21
-    Top = 384
+    Top = 400
     Width = 51
     Increment = 0.1
     MaxValue = 5
@@ -207,7 +207,7 @@ object Form1: TForm1
     Value = 0.6
   end
   object Button6: TButton
-    Left = 560
+    Left = 558
     Height = 27
     Top = 248
     Width = 75
@@ -225,7 +225,7 @@ object Form1: TForm1
     TabOrder = 6
   end
   object Button7: TButton
-    Left = 568
+    Left = 558
     Height = 27
     Top = 328
     Width = 75
@@ -249,7 +249,7 @@ object Form1: TForm1
     ParentFont = False
   end
   object Labeltime1: TLabel
-    Left = 296
+    Left = 302
     Height = 16
     Top = 528
     Width = 20
@@ -389,72 +389,6 @@ object Form1: TForm1
     Caption = '0.00uF'
     ParentColor = False
   end
-  object RadioRamp: TRadioGroup
-    Left = 656
-    Height = 39
-    Top = 320
-    Width = 136
-    AutoFill = True
-    Caption = 'Ramp'
-    ChildSizing.LeftRightSpacing = 6
-    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-    ChildSizing.EnlargeVertical = crsHomogenousChildResize
-    ChildSizing.ShrinkHorizontal = crsScaleChilds
-    ChildSizing.ShrinkVertical = crsScaleChilds
-    ChildSizing.Layout = cclLeftToRightThenTopToBottom
-    ChildSizing.ControlsPerLine = 3
-    ClientHeight = 21
-    ClientWidth = 132
-    Columns = 3
-    TabOrder = 14
-    object RadioPM: TRadioButton
-      Left = 6
-      Height = 21
-      Top = 0
-      Width = 48
-      Caption = '+/-  '
-      Checked = True
-      Font.CharSet = ANSI_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -16
-      Font.Name = 'MS Sans Serif'
-      Font.Pitch = fpVariable
-      Font.Quality = fqDraft
-      ParentFont = False
-      TabOrder = 2
-      TabStop = True
-    end
-    object RadioP: TRadioButton
-      Left = 54
-      Height = 21
-      Top = 0
-      Width = 39
-      Caption = '+  '
-      Font.CharSet = ANSI_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -16
-      Font.Name = 'MS Sans Serif'
-      Font.Pitch = fpVariable
-      Font.Quality = fqDraft
-      ParentFont = False
-      TabOrder = 0
-    end
-    object RadioM: TRadioButton
-      Left = 93
-      Height = 21
-      Top = 0
-      Width = 33
-      Caption = '-  '
-      Font.CharSet = ANSI_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -16
-      Font.Name = 'MS Sans Serif'
-      Font.Pitch = fpVariable
-      Font.Quality = fqDraft
-      ParentFont = False
-      TabOrder = 1
-    end
-  end
   object ButtonADC: TButton
     Left = 539
     Height = 24
@@ -462,7 +396,7 @@ object Form1: TForm1
     Width = 69
     Caption = 'Read ADC'
     OnClick = ButtonADCClick
-    TabOrder = 15
+    TabOrder = 14
   end
   object LabeladcV: TLabel
     Left = 680
@@ -488,7 +422,7 @@ object Form1: TForm1
     MaxValue = 11.2
     MinValue = 2.4
     OnChange = FloatSineMagChange
-    TabOrder = 16
+    TabOrder = 15
     Value = 11.2
   end
   object LabelSineMag: TLabel
@@ -537,7 +471,7 @@ object Form1: TForm1
     MaxValue = 10
     MinValue = 1
     OnChange = SpinTraceChange
-    TabOrder = 17
+    TabOrder = 16
     Value = 1
   end
   object LabelTrace: TLabel
@@ -563,7 +497,7 @@ object Form1: TForm1
     MaxValue = 10
     MinValue = 1
     OnChange = SpinMultipleChange
-    TabOrder = 18
+    TabOrder = 17
     Value = 1
   end
   object LabelMult: TLabel
@@ -588,12 +522,12 @@ object Form1: TForm1
     Width = 70
     Caption = 'Clear Trace'
     OnClick = ButtonClrTraceClick
-    TabOrder = 19
+    TabOrder = 18
   end
   object Label4: TLabel
     Left = 539
     Height = 13
-    Top = 384
+    Top = 400
     Width = 80
     Caption = 'Set Start Voltage'
     ParentColor = False
@@ -601,19 +535,19 @@ object Form1: TForm1
   object dacspin1: TFloatSpinEdit
     Left = 624
     Height = 21
-    Top = 408
+    Top = 424
     Width = 51
     Increment = 0.1
     MaxValue = 5
     MinValue = 0
     OnChange = dacspinChange
-    TabOrder = 20
+    TabOrder = 19
     Value = 0.88
   end
   object Label5: TLabel
     Left = 539
     Height = 13
-    Top = 408
+    Top = 424
     Width = 80
     Caption = 'Set Step Voltage'
     ParentColor = False
@@ -621,11 +555,11 @@ object Form1: TForm1
   object Button5steps: TButton
     Left = 691
     Height = 25
-    Top = 387
+    Top = 403
     Width = 79
     Caption = 'Run 5 Steps'
     OnClick = Button5stepsClick
-    TabOrder = 21
+    TabOrder = 20
   end
   object SpinFreq: TSpinEdit
     Left = 671
@@ -635,7 +569,7 @@ object Form1: TForm1
     MaxValue = 45
     MinValue = 4
     OnChange = SpinFreqChange
-    TabOrder = 22
+    TabOrder = 21
     Value = 16
   end
   object LabelFreq: TLabel
@@ -645,6 +579,82 @@ object Form1: TForm1
     Width = 49
     Caption = 'f = 60.2Hz'
     ParentColor = False
+  end
+  object UpDownMin: TUpDown
+    Left = 640
+    Height = 30
+    Top = 328
+    Width = 16
+    Max = 255
+    Min = 0
+    OnClick = UpDownMinClick
+    Position = 0
+    TabOrder = 22
+    Wrap = False
+  end
+  object LabelMinV: TLabel
+    Left = 664
+    Height = 13
+    Top = 331
+    Width = 31
+    Caption = '-11.5V'
+    ParentColor = False
+    OnClick = LabelMinVClick
+  end
+  object UpDownMax: TUpDown
+    Left = 736
+    Height = 30
+    Top = 329
+    Width = 16
+    Max = 255
+    Min = 0
+    OnClick = UpDownMaxClick
+    Position = 255
+    TabOrder = 23
+    Wrap = False
+  end
+  object LabelMaxV: TLabel
+    Left = 758
+    Height = 13
+    Top = 333
+    Width = 28
+    Caption = '11.4V'
+    ParentColor = False
+  end
+  object Label6: TLabel
+    Left = 712
+    Height = 13
+    Top = 333
+    Width = 9
+    Caption = 'to'
+    ParentColor = False
+  end
+  object ButtonNeg: TButton
+    Left = 560
+    Height = 20
+    Top = 360
+    Width = 34
+    Caption = 'Neg'
+    OnClick = ButtonNegClick
+    TabOrder = 24
+  end
+  object ButtonPos: TButton
+    Left = 608
+    Height = 20
+    Top = 360
+    Width = 34
+    Caption = 'Pos'
+    OnClick = ButtonPosClick
+    TabOrder = 25
+  end
+  object ButtonMax: TButton
+    Left = 656
+    Height = 20
+    Top = 360
+    Width = 34
+    Caption = 'Max'
+    OnClick = ButtonMaxClick
+    TabOrder = 26
   end
   object SaveDialog1: TSaveDialog
     DefaultExt = '.*.trc'

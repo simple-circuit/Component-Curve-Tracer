@@ -39,12 +39,15 @@ type
   TForm1 = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    ButtonNeg: TButton;
     Button5steps: TButton;
     ButtonClrTrace: TButton;
     ButtonADC: TButton;
     ButtonC: TButton;
     Button6: TButton;
     Button7: TButton;
+    ButtonPos: TButton;
+    ButtonMax: TButton;
     CheckBox1: TCheckBox;
     checkXt: TCheckBox;
     Checkcct: TCheckBox;
@@ -57,6 +60,9 @@ type
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
+    Label6: TLabel;
+    LabelMaxV: TLabel;
+    LabelMinV: TLabel;
     LabelFreq: TLabel;
     LabelSineMag: TLabel;
     LabeladcV: TLabel;
@@ -85,10 +91,6 @@ type
     MenuLoadCal: TMenuItem;
     PrintDialog1: TPrintDialog;
     PrinterSetupDialog1: TPrinterSetupDialog;
-    RadioPM: TRadioButton;
-    RadioP: TRadioButton;
-    RadioM: TRadioButton;
-    RadioRamp: TRadioGroup;
     SaveDialog1: TSaveDialog;
     OpenDialog1: TOpenDialog;
     MainMenu1: TMainMenu;
@@ -123,6 +125,8 @@ type
     PrintPlot1: TMenuItem;
     SavetoFile1: TMenuItem;
     SamplePoint: TSpinEdit;
+    UpDownMax: TUpDown;
+    UpDownMin: TUpDown;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
@@ -132,6 +136,9 @@ type
     procedure ButtonADCClick(Sender: TObject);
     procedure ButtonCClick(Sender: TObject);
     procedure ButtonClrTraceClick(Sender: TObject);
+    procedure ButtonMaxClick(Sender: TObject);
+    procedure ButtonNegClick(Sender: TObject);
+    procedure ButtonPosClick(Sender: TObject);
     procedure CheckBox1Change(Sender: TObject);
     procedure checkXtChange(Sender: TObject);
     procedure CheckcctChange(Sender: TObject);
@@ -151,9 +158,12 @@ type
     procedure com91Click(Sender: TObject);
     procedure com101Click(Sender: TObject);
     procedure getcal(Sender: TObject);
+    procedure LabelMinVClick(Sender: TObject);
     procedure mnuExitClick(Sender: TObject);
     procedure FomrDestroy(Sender: TObject);
     procedure Copy2Click(Sender: TObject);
+    procedure RadioPChange(Sender: TObject);
+    procedure RadioPMChange(Sender: TObject);
     procedure SamplePointChange(Sender: TObject);
     procedure SpinFreqChange(Sender: TObject);
     procedure SpinMultipleChange(Sender: TObject);
@@ -176,6 +186,8 @@ type
     procedure UDp01Click(Sender: TObject; Button: TUDBtnType);
     procedure PrintPlot1Click(Sender: TObject);
     procedure SavetoFile1Click(Sender: TObject);
+    procedure UpDownMaxClick(Sender: TObject; Button: TUDBtnType);
+    procedure UpDownMinClick(Sender: TObject; Button: TUDBtnType);
   private
      { Private declarations }
 
@@ -222,7 +234,7 @@ var
    markV,markT,markI : single;
    deltaV, deltaT,deltaI : single;
    scancount : integer;
-   vgain, igain, voff, ioff : single;
+   vgain, igain, voff, ioff, icomp : single;
    freq, bv : single;
    trace, trace_count : integer;
 
@@ -623,7 +635,7 @@ begin
      trystrtoint(copy(s,4,4),adc0);
      trystrtoint(copy(s,8,4),adc1);
      cctVI[0,dcount,trace] :=  (adc0-voff)*vgain;
-     cctVI[1,dcount,trace] :=  -(adc1-ioff)*igain - ((3.177-cctVI[0,dcount,trace])/320.0);
+     cctVI[1,dcount,trace] :=  -(adc1-ioff)*igain + cctVI[0,dcount,trace]*icomp;
      dcount := dcount+1;
      if dcount = 256 then begin
       for j := 0 to 255 do begin
@@ -639,7 +651,7 @@ begin
      trystrtoint(copy(s,4,4),adc0);
      trystrtoint(copy(s,8,4),adc1);
      cctVI[0,dcount,trace] :=  (adc0-voff)*vgain;
-     cctVI[1,dcount,trace] := -(adc1-ioff)*igain - ((3.177-cctVI[0,dcount,trace])/320.0);
+     cctVI[1,dcount,trace] := -(adc1-ioff)*igain + cctVI[0,dcount,trace]*icomp;
      dcount := dcount+1;
      if dcount = 256 then begin
       for j := 0 to 255 do begin
@@ -679,8 +691,9 @@ begin
 
  vgain := 0.0233;    //default calibration constants
  igain := 0.00976;
- voff := 512;
- ioff := 512;
+ voff := 512.0;
+ ioff := 509.5;
+ icomp := 0.00518;
  freq := 60.2;
  trace := 1;
  trace_count := 0;
@@ -765,12 +778,19 @@ begin
     Read(F, igain);
     form1.memo1.Append(format('igain = %1.5f',[igain]));
     Read(F, voff);
-    form1.memo1.Append(format('voff = %3.0f',[voff]));
+    form1.memo1.Append(format('voff = %3.1f',[voff]));
     Read(F, ioff);
-    form1.memo1.Append(format('ioff = %3.0f',[ioff]));
+    form1.memo1.Append(format('ioff = %3.1f',[ioff]));
+    Read(F, icomp);
+    form1.memo1.Append(format('icomp = %0.5f',[icomp]));
    except
     form1.memo1.Append('Calibration file did not load');
    end;
+end;
+
+procedure TForm1.LabelMinVClick(Sender: TObject);
+begin
+
 end;
 
 //Menu exit item
@@ -790,6 +810,16 @@ end;
 procedure TForm1.Copy2Click(Sender: TObject);
 begin
   Clipboard.Assign(myimage);
+end;
+
+procedure TForm1.RadioPChange(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.RadioPMChange(Sender: TObject);
+begin
+
 end;
 
 procedure TForm1.SamplePointChange(Sender: TObject);
@@ -1106,6 +1136,21 @@ begin
   form1.SaveDialog1.Filename := ChangeFileExt(form1.SaveDialog1.FileName, '.bmp');
   if form1.SaveDialog1.Execute then  myimage.SaveToFile(form1.SaveDialog1.Filename);
 end;
+
+procedure TForm1.UpDownMaxClick(Sender: TObject; Button: TUDBtnType);
+begin
+ dcount := 0;
+ transmitcommand('pos',UpDownMax.Position);
+ labelMaxV.Caption := format('%1.1fV',[(UpDownMax.Position - 128)*11.5/128.0]);
+end;
+
+procedure TForm1.UpDownMinClick(Sender: TObject; Button: TUDBtnType);
+begin
+ dcount := 0;
+ transmitcommand('neg',UpDownMin.Position);
+ labelMinV.Caption := format('%1.1fV',[(UpDownMin.Position - 128)*11.5/128.0]);
+end;
+
 procedure TForm1.Button1Click(Sender: TObject);
 begin
   dosavescript;
@@ -1154,9 +1199,7 @@ procedure TForm1.Button7Click(Sender: TObject);
 begin
  timerS.enabled := false;
  dcount := 0;
- if form1.radioPM.checked then transmitcommand('mea',0);
- if radioM.checked then transmitcommand('neg',0);
- if radioP.checked then transmitcommand('pos',0);
+ transmitcommand('mea',0);
 end;
 
 procedure TForm1.ButtonADCClick(Sender: TObject);
@@ -1164,7 +1207,7 @@ begin
   dcount := 0;
   transmitcommand('adc', UDchannel.Position);
 end;
-//Calculate Capacitrance
+//Calculate Capacitance
 procedure TForm1.ButtonCClick(Sender: TObject);
 var
   i : integer;
@@ -1194,6 +1237,39 @@ begin
     cctVI[2,i,trace] := 0.0;
  end;
  plotdata;
+end;
+
+procedure TForm1.ButtonMaxClick(Sender: TObject);
+begin
+  UpDownMin.Position:=0;
+  UpDownMax.Position:=255;
+  dcount := 0;
+  transmitcommand('neg',UpDownMin.Position);
+  labelMinV.Caption := format('%1.1fV',[(UpDownMin.Position - 128)*11.5/128.0]);
+  transmitcommand('pos',UpDownMax.Position);
+  labelMaxV.Caption := format('%1.1fV',[(UpDownMax.Position - 128)*11.5/128.0]);
+end;
+
+procedure TForm1.ButtonNegClick(Sender: TObject);
+begin
+  UpDownMin.Position:=0;
+  UpDownMax.Position:=128;
+  dcount := 0;
+  transmitcommand('neg',UpDownMin.Position);
+  labelMinV.Caption := format('%1.1fV',[(UpDownMin.Position - 128)*11.5/128.0]);
+  transmitcommand('pos',UpDownMax.Position);
+  labelMaxV.Caption := format('%1.1fV',[(UpDownMax.Position - 128)*11.5/128.0]);
+end;
+
+procedure TForm1.ButtonPosClick(Sender: TObject);
+begin
+  UpDownMin.Position:=128;
+  UpDownMax.Position:=255;
+  dcount := 0;
+  transmitcommand('neg',UpDownMin.Position);
+  labelMinV.Caption := format('%1.1fV',[(UpDownMin.Position - 128)*11.5/128.0]);
+  transmitcommand('pos',UpDownMax.Position);
+  labelMaxV.Caption := format('%1.1fV',[(UpDownMax.Position - 128)*11.5/128.0]);
 end;
 
 end.
