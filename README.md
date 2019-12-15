@@ -6,8 +6,8 @@ Circuit built with Dual Op Amp, resistors and capacitors.
 
 Power: Needs four 9V batteries or a 5V to +-15 DC to DC converter. 
 
-Application: uno_pwm_ct.exe for viewing waveforms (includes source code).
+Windows(R) Application: uno_pwm_ct.exe for viewing waveforms (includes source code).
 
-Application: un_pwm_ct for Raspberry Pi model 3. Change file permissions to Execute: Anyone
+Raspberry Pi model 3 Application: un_pwm_ct (Change file permissions to Execute: Anyone to run)
 
 Arduino sketch and Fritzing file to aid building.
