@@ -48,6 +48,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnDestroy = FomrDestroy
   OnMouseDown = FormMouseDown
+  OnPaint = Plotdata1
   ShowHint = True
   LCLVersion = '1.6.4.0'
   object Shape6: TShape

@@ -24,13 +24,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. }
 
+
+//{$DEFINE pi3}  //comment out for windows 10 compile
+{$DEFINE win10}
+//Windows(R) uses native serial port calls to improve data transfer speed
+//native windows serial functions allow for test of an active port
+
+
 interface
+
+{$ifdef pi3}
+uses
+  SysUtils, LCLIntf, LCLType, Classes, Graphics, Controls, Forms, Dialogs,
+  StdCtrls, ExtCtrls, Menus, Spin, Buttons, Clipbrd, math,
+  ComCtrls, printers, Grids, PrintersDlgs, serial, strutils;
+{$else}
 
 uses
   windows,LCLIntf, LCLType, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, Menus, Spin, Buttons, Clipbrd, math,
   printers, Grids, ComCtrls, Arrow, PrintersDlgs, strutils;
-
+ {$endif}
 
 type
 
@@ -162,8 +176,7 @@ type
     procedure mnuExitClick(Sender: TObject);
     procedure FomrDestroy(Sender: TObject);
     procedure Copy2Click(Sender: TObject);
-    procedure RadioPChange(Sender: TObject);
-    procedure RadioPMChange(Sender: TObject);
+    procedure Plotdata1(Sender: TObject);
     procedure SamplePointChange(Sender: TObject);
     procedure SpinFreqChange(Sender: TObject);
     procedure SpinMultipleChange(Sender: TObject);
@@ -201,7 +214,6 @@ var
 
 implementation
 
-//uses serial;
 
 {$R *.lfm}
 
@@ -215,15 +227,21 @@ var
    LogName : string;               //File name for sript file saves
    cstring : string;
    fname : string;                 //File Name for script file saves
-   d : tDCB;                      //Serial port I/O definitions
+
+   //Serial port I/O definitions
+   {$ifdef pi3}
+   {$else}
+      d : tDCB;
+      cp : tcommprop;
+      cs : tcomstat;
+      a : longbool;
+      a2 : bool;
+   {$endif}
+
    p : ^dword;
    dw :dword;
    comhand: thandle;
-   a : longbool;
-   a2 : bool;
 
-   cp : tcommprop;
-   cs : tcomstat;
 
    adc0,adc1,adcA,adcB,adcC,adcD,adcE,adcF,adcG, adcI : integer;
    cctVI : array[0..2,0..512,1..10] of single;  //{V,I,t},{values},{trace}
@@ -237,6 +255,115 @@ var
    vgain, igain, voff, ioff, icomp : single;
    freq, bv : single;
    trace, trace_count : integer;
+
+
+ {$ifdef pi3}
+
+   //Open serial comport #1 to #20 and set to 8 data no parity baud=921600. return 0 on error;
+   Function opencomport(portnum : smallint): smallint;
+   begin
+    if (portnum < 1) or (portnum > 4) then portnum := 1;
+    if portnum = 1 then FileName := '/dev/ttyACM0';
+    if portnum = 2 then FileName := '/dev/ttyACM1';
+    if portnum = 3 then FileName := '/dev/ttyUSB0';
+    if portnum = 4 then FileName := '/dev/ttyUSB1';
+
+    comhand := Serial.SerOpen(FileName);    //Open ComX for input-output mode
+    opencomport := -1;                                 //If open works, return all ones
+     try
+      serial.SerSetParams(comhand,115200,8,NoneParity,1,[]);
+     except
+       opencomport := 0;                            //Return zero if error
+     end;
+    end;
+   //Close the serial port
+   procedure closecomport;                         //Shut down the serial port
+   begin
+    try
+     Serial.SerClose(comhand);
+    except
+    end;
+   end;
+
+   //Transmit the lower byte of an integer through the serial port. return -1 on error
+   function transmitcombyte(databyte : smallint): smallint;
+   var
+      c : char;
+      p9 : array[0..2] of char;
+      f : word;
+   begin
+    if databyte <0 then databyte := 0;
+    if databyte >255 then databyte := 255;
+    c := chr(databyte);
+    p9[0] := c;
+    p9[1] := chr(0);
+    try
+     f := serial.SerWrite(comhand, p9[0], 1);
+     sleep(1);
+    except
+      f := 0;
+    end;
+    if f = 0 then transmitcombyte := -1 else transmitcombyte := 0;  //on error return -1 else 0 if sent
+   end;
+
+   //write a serial string command to the arduino
+   procedure writecommand(cs2 : shortstring);
+   var
+    i : smallint;
+    p9 : array[0..255] of char;
+    f : word;
+    count : integer;
+   begin
+    count := Length(cs2);
+    if count < 1 then exit;
+    for i := 0 to count-1 do p9[i]:= cs2[i+1];
+    p9[count] := char(13);       //add CR
+    p9[count+1] := char(10);     //add LF
+   try
+    f := Serial.SerWrite(comhand, p9[0], count+2);
+    sleep(15);
+   except
+   end;
+   end;
+
+   //get one byte from com port buffer. return byte 0-255 but if no data available, return 256
+   function readcombyte(): integer;
+   var
+    f : word;
+    b : array[0..1] of byte;
+   begin
+     b[0] := 0;
+     readcombyte := 256;                  //return 256 if no byte was recieved
+   try
+    f := Serial.SerRead(comhand, b[0], 1);
+   except
+    f := 0;
+   end;
+    if f = 1 then readcombyte := b[0] else readcombyte := 256;
+   end;
+// Transmits command string cmds + integer i4 converted to a 4 byte string
+   procedure transmitcommand(cmds : string ; i4 : integer);
+   var
+    j1, j2, j3, j4 : integer;
+   begin
+      transmitcombyte(ord('@'));
+      transmitcombyte(ord(cmds[1]));
+      transmitcombyte(ord(cmds[2]));
+      transmitcombyte(ord(cmds[3]));
+      j4 := i4 mod 10;
+      i4 := i4 div 10;
+      j3 := i4 mod 10;
+      i4 := i4 div 10;
+      j2 := i4 mod 10;
+      i4 := i4 div 10;
+      j1 := i4 mod 10;
+      i4 := i4 div 10;
+      transmitcombyte(j1+ord('0'));
+      transmitcombyte(j2+ord('0'));
+      transmitcombyte(j3+ord('0'));
+      transmitcombyte(j4+ord('0'));
+   end;
+ {$else}
 
    //Open serial comport 8 data no parity baud=19200 return 0 on error;
    Function opencomport(portnum : smallint): smallint;
@@ -369,6 +496,8 @@ var
       transmitcombyte(j3+ord('0'));
       transmitcombyte(j4+ord('0'));
    end;
+{$endif}
+
 procedure updateCursor();
 begin
   if plotf = 0 then begin
@@ -685,6 +814,28 @@ var
  i, cstats : integer;
 begin
 
+ {$ifdef pi3}
+   form1.comport1.caption:='/dev/ttyACM1';
+   com11.Caption:='/dev/ttyACM0';
+   com21.Caption:='/dev/ttyACM1';
+   com31.Caption:='/dev/ttyUSB0';
+   com41.Caption:='/dev/ttyUSB1';
+   com51.Visible:=false;
+   com51.Visible:=false;
+   com61.Visible:=false;
+   com71.Visible:=false;
+   com81.Visible:=false;
+   com91.Visible:=false;
+   com101.Visible:=false;
+   com111.Visible:=false;
+   com121.Visible:=false;
+   com131.Visible:=false;
+   com141.Visible:=false;
+   com151.Visible:=false;
+   com161.Visible:=false;
+   com171.Visible:=false;
+ {$endif}
+
  scancount := -1;
  dcount := 0;
  fname := 'LogNull'; //Script file default file name for data output
@@ -812,14 +963,9 @@ begin
   Clipboard.Assign(myimage);
 end;
 
-procedure TForm1.RadioPChange(Sender: TObject);
+procedure TForm1.Plotdata1(Sender: TObject);
 begin
-
-end;
-
-procedure TForm1.RadioPMChange(Sender: TObject);
-begin
-
+  plotdata;
 end;
 
 procedure TForm1.SamplePointChange(Sender: TObject);
@@ -1029,6 +1175,9 @@ begin
  if opencomport(1) <> 0 then begin
   form1.com11.checked := true;
   form1.comport1.caption := 'com1';
+  {$ifdef pi3}
+   form1.comport1.caption:='/dev/ttyACM0';
+  {$endif}
  end else
   form1.comport1.caption := 'Com: XX';
 end;
@@ -1040,6 +1189,9 @@ begin
  if opencomport(2) <> 0 then begin
   form1.com21.checked := true;
   form1.comport1.caption := 'com2';
+  {$ifdef pi3}
+   form1.comport1.caption:='/dev/ttyACM1';
+  {$endif}
  end else
   form1.comport1.caption := 'Com: XX';
 end;
@@ -1051,6 +1203,9 @@ begin
  if opencomport(3) <> 0 then begin
   form1.com31.checked := true;
   form1.comport1.caption := 'com3';
+  {$ifdef pi3}
+   form1.comport1.caption:='/dev/ttyUSB0';
+  {$endif}
  end else
   form1.comport1.caption := 'Com: XX';
 end;
@@ -1062,6 +1217,9 @@ begin
  if opencomport(4) <> 0 then begin
   form1.com41.checked := true;
   form1.comport1.caption := 'com4';
+  {$ifdef pi3}
+   form1.comport1.caption:='/dev/ttyUSB1';
+  {$endif}
  end else
   form1.comport1.caption := 'Com: XX';
 end;
