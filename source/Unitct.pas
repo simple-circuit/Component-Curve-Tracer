@@ -1378,9 +1378,9 @@ begin
    Ix[i] := cctVI[1,i,trace];
  end;
  imax := maxvalue(Ix[0..255]);
- imax := minvalue(Ix[0..255]);
+ imin := minvalue(Ix[0..255]);
  vmax := maxvalue(Vx[0..255]);
- vmax := minvalue(Vx[0..255]);
+ vmin := minvalue(Vx[0..255]);
  c := 1000.0*(imax-imin)/((vmax-vmin) * 6.2832 * freq);
  labelC.caption := format('%2.2fuf',[c-0.005]);
 end;

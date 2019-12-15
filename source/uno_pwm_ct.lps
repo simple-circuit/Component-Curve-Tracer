@@ -19,8 +19,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="170"/>
-        <CursorPos Y="180"/>
+        <TopLine Value="1368"/>
+        <CursorPos Y="1384"/>
         <UsageCount Value="115"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -182,7 +182,7 @@
       </Position29>
       <Position30>
         <Filename Value="Unitct.pas"/>
-        <Caret Line="972" TopLine="992"/>
+        <Caret Line="180" TopLine="170"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>
