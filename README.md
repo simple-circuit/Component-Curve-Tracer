@@ -10,6 +10,10 @@ Windows(R) Application: uno_pwm_ct.exe for viewing waveforms (includes source co
 
 Raspberry Pi model 3 Application: un_pwm_ct (Change file permissions to Execute: Anyone to run)
 
+Experimental Python 3 appliclation uno_ct_v1.py for Raspberry Pi 3
+
 Arduino sketch and Fritzing file to aid building.
 
 ![](./capacitor.png)
+
+![](./pyton_ct.png)
