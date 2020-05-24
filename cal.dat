@@ -4,6 +4,6 @@ vgain igain voff ioff icomp
 vgain: volts per analog to digital unit
 igain: mA per analog to digital unit
 voff: mid point for Voltage analog to digital unit
-ioff: mid point for Current analong to digital unit
+ioff: mid point for Current analog to digital unit
 icomp: constant to correct for voltage sense circuit
 
