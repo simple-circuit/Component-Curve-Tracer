@@ -6,13 +6,15 @@ Circuit built with Dual Op Amp, resistors and capacitors.
 
 Power: Needs four 9V batteries or a 5V to +-15 DC to DC converter. 
 
-Windows(R) Application: uno_pwm_ct.exe for viewing waveforms (includes source code).
+Windows(R) Application: uno_pwm_ct.exe for viewing waveforms (includes Pascal source code).
 
-Raspberry Pi model 3 Application: un_pwm_ct (Change file permissions to Execute: Anyone to run)
+Raspberry Pi model 3 Linux Application: un_pwm_ct (Change file permissions to Execute: Anyone to run)
 
-Experimental Python 3 appliclation uno_ct_v2.py for Raspberry Pi 3
+Raspberry Pi Python 3 Appliclation: uno_ct_v2.py
 
-Arduino sketch and Fritzing file to aid building.
+Arduino sketch, Fritzing file, and CNC milling/drill files to aid building.
+
+![](./pcb.png)
 
 ![](./capacitor.png)
 
